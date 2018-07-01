@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # This code is supporting material for the book
 # Building Machine Learning Systems with Python
 # by Willi Richert and Luis Pedro Coelho
@@ -13,8 +14,13 @@ import matplotlib.pyplot as plt
 sp.random.seed(3)  # to reproduce the data later on
 
 data = sp.genfromtxt(os.path.join(DATA_DIR, "web_traffic.tsv"), delimiter="\t")
+# print 10 rows data
+
+print '--------------data--------------'
 print(data[:10])
 print(data.shape)
+
+print '---------------------------------'
 
 # all examples will have three classes in this file
 colors = ['g', 'k', 'b', 'm', 'r']
@@ -26,7 +32,7 @@ print("Number of invalid entries:", sp.sum(sp.isnan(y)))
 x = x[~sp.isnan(y)]
 y = y[~sp.isnan(y)]
 
-# plot input data
+# plot input data into image file
 def plot_models(x, y, models, fname, mx=None, ymax=None, xmin=None):
 
     plt.figure(num=None, figsize=(8, 6))
@@ -61,9 +67,16 @@ def plot_models(x, y, models, fname, mx=None, ymax=None, xmin=None):
 plot_models(x, y, None, os.path.join(CHART_DIR, "1400_01_01.png"))
 
 # create and plot models
+# polyfit -- 多项式拟合数据
+# 数字 -- 期望的多项式的阶
+# full -- True表示更多显示逼近过程信息
+
+# fp1 -- function parameter
 fp1, res1, rank1, sv1, rcond1 = sp.polyfit(x, y, 1, full=True)
 print("Model parameters of fp1: %s" % fp1)
 print("Error of the model of fp1:", res1)
+
+# poly1d -- 根据参数创建模型函数
 f1 = sp.poly1d(fp1)
 
 fp2, res2, rank2, sv2, rcond2 = sp.polyfit(x, y, 2, full=True)
@@ -80,9 +93,10 @@ plot_models(
     x, y, [f1, f2, f3, f10, f100], os.path.join(CHART_DIR, "1400_01_04.png"))
 
 # fit and plot a model using the knowledge about inflection point
-inflection = 3.5 * 7 * 24
+inflection = int(3.5 * 7 * 24)
 xa = x[:inflection]
 ya = y[:inflection]
+#拐点后的数据
 xb = x[inflection:]
 yb = y[inflection:]
 
@@ -133,6 +147,7 @@ plot_models(
 # separating training from testing data
 frac = 0.3
 split_idx = int(frac * len(xb))
+#随机数据index
 shuffled = sp.random.permutation(list(range(len(xb))))
 test = sorted(shuffled[:split_idx])
 train = sorted(shuffled[split_idx:])
@@ -154,8 +169,10 @@ plot_models(
     mx=sp.linspace(0 * 7 * 24, 6 * 7 * 24, 100),
     ymax=10000, xmin=0 * 7 * 24)
 
+## 预测结果
 from scipy.optimize import fsolve
 print(fbt2)
 print(fbt2 - 100000)
+# 求解方程的根
 reached_max = fsolve(fbt2 - 100000, x0=800) / (7 * 24)
 print("100,000 hits/hour expected at week %f" % reached_max[0])
